@@ -7,7 +7,7 @@ describe("Contacto", () => {
     expect(c.getNombre()).toBe("Ana Pérez");
     expect(c.getEmail()).toBe("ana@ucp.edu.ar");
   });
-    it("rechaza un nombre vacío", () => {
+  it("rechaza un nombre vacío", () => {
     expect(() => new Contacto("   ", "ana@ucp.edu.ar")).toThrow("nombre");
   });
 
@@ -22,7 +22,7 @@ describe("Contacto", () => {
     expect(() => c.setNombre("")).toThrow("nombre");
     expect(c.getNombre()).toBe("Ana");
   });
-    it("guarda el email en minúsculas y sin espacios", () => {
+  it("guarda el email en minúsculas y sin espacios", () => {
     const c = new Contacto("Ana", "  ANA@UCP.edu.ar ");
     expect(c.getEmail()).toBe("ana@ucp.edu.ar");
   });
