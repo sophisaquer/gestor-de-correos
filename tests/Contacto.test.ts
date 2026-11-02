@@ -22,4 +22,15 @@ describe("Contacto", () => {
     expect(() => c.setNombre("")).toThrow("nombre");
     expect(c.getNombre()).toBe("Ana");
   });
+    it("guarda el email en minúsculas y sin espacios", () => {
+    const c = new Contacto("Ana", "  ANA@UCP.edu.ar ");
+    expect(c.getEmail()).toBe("ana@ucp.edu.ar");
+  });
+
+  it("rechaza emails con formato inválido", () => {
+    expect(() => new Contacto("Ana", "anaucp.edu.ar")).toThrow("email");
+    expect(() => new Contacto("Ana", "ana@ucp")).toThrow("email");
+    expect(() => new Contacto("Ana", "ana @ucp.edu.ar")).toThrow("email");
+    expect(() => new Contacto("Ana", "")).toThrow("email");
+  });
 });
