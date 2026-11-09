@@ -86,6 +86,10 @@ export class Correo {
     this.favorito = false;
   }
 
+  esValidoParaEnviar(): boolean {
+    return this.asunto.trim() !== "" && this.destinatarios.length > 0;
+  }
+
   private tieneDestinatario(email: string): boolean {
     const buscado = email.trim().toLowerCase();
     return this.destinatarios.some((d) => d.getEmail() === buscado);
