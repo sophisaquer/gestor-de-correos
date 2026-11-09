@@ -93,38 +93,37 @@ describe("Correo", () => {
     expect(correo.getDestinatarios()).toEqual([beto]);
     expect(correo.getDestinatarios()[0].getEmail()).toBe("beto@ucp.edu.ar");
   });
+});
 
+describe("Correo - validación para enviar", () => {
+  it("es válido con remitente, asunto y al menos un destinatario", () => {
+    const correo = new Correo(ana, "Examen", "", [beto]);
+    expect(correo.esValidoParaEnviar()).toBe(true);
+  });
 
-  describe("Correo - validación para enviar", () => {
-    it("es válido con remitente, asunto y al menos un destinatario", () => {
-      const correo = new Correo(ana, "Examen", "", [beto]);
-      expect(correo.esValidoParaEnviar()).toBe(true);
-    });
+  it("es válido con varios destinatarios", () => {
+    const correo = new Correo(ana, "Examen", "", [beto, caro]);
+    expect(correo.esValidoParaEnviar()).toBe(true);
+  });
 
-    it("es válido con varios destinatarios", () => {
-      const correo = new Correo(ana, "Examen", "", [beto, caro]);
-      expect(correo.esValidoParaEnviar()).toBe(true);
-    });
+  it("no es válido sin asunto", () => {
+    const correo = new Correo(ana, "", "Hola", [beto]);
+    expect(correo.esValidoParaEnviar()).toBe(false);
+  });
 
-    it("no es válido sin asunto", () => {
-      const correo = new Correo(ana, "", "Hola", [beto]);
-      expect(correo.esValidoParaEnviar()).toBe(false);
-    });
+  it("no es válido si el asunto tiene solo espacios", () => {
+    const correo = new Correo(ana, "   ", "Hola", [beto]);
+    expect(correo.esValidoParaEnviar()).toBe(false);
+  });
 
-    it("no es válido si el asunto tiene solo espacios", () => {
-      const correo = new Correo(ana, "   ", "Hola", [beto]);
-      expect(correo.esValidoParaEnviar()).toBe(false);
-    });
+  it("no es válido sin destinatarios", () => {
+    const correo = new Correo(ana, "Examen");
+    expect(correo.esValidoParaEnviar()).toBe(false);
+  });
 
-    it("no es válido sin destinatarios", () => {
-      const correo = new Correo(ana, "Examen");
-      expect(correo.esValidoParaEnviar()).toBe(false);
-    });
-
-    it("deja de ser válido si se quita el único destinatario", () => {
-      const correo = new Correo(ana, "Examen", "", [beto]);
-      correo.quitarDestinatario("beto@ucp.edu.ar");
-      expect(correo.esValidoParaEnviar()).toBe(false);
-    });
+  it("deja de ser válido si se quita el único destinatario", () => {
+    const correo = new Correo(ana, "Examen", "", [beto]);
+    correo.quitarDestinatario("beto@ucp.edu.ar");
+    expect(correo.esValidoParaEnviar()).toBe(false);
   });
 });
