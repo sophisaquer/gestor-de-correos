@@ -117,4 +117,66 @@ describe("GestorDeCorreos", () => {
     gestor.listar("entrada").pop();
     expect(gestor.listar("entrada")).toHaveLength(1);
   });
+
+
+  describe("GestorDeCorreos - borradores", () => {
+    it("permite recuperar los borradores guardados", () => {
+      const gestor = new GestorDeCorreos();
+      const b1 = new Correo(ana, "Uno");
+      const b2 = new Correo(ana);
+      gestor.guardarBorrador(b1);
+      gestor.guardarBorrador(b2);
+      expect(gestor.listar("borradores")).toEqual([b1, b2]);
+    });
+
+    it("edita el asunto y el cuerpo de un borrador", () => {
+      const gestor = new GestorDeCorreos();
+      const borrador = new Correo(ana);
+      gestor.guardarBorrador(borrador);
+      gestor.editarBorrador(borrador, { asunto: "Reunión", cuerpo: "Mañana a las 10" });
+      const recuperado = gestor.listar("borradores")[0];
+      expect(recuperado.getAsunto()).toBe("Reunión");
+      expect(recuperado.getCuerpo()).toBe("Mañana a las 10");
+    });
+
+    it("solo cambia los campos indicados", () => {
+      const gestor = new GestorDeCorreos();
+      const borrador = new Correo(ana, "Asunto original", "Cuerpo original");
+      gestor.guardarBorrador(borrador);
+      gestor.editarBorrador(borrador, { cuerpo: "Cuerpo nuevo" });
+      expect(borrador.getAsunto()).toBe("Asunto original");
+      expect(borrador.getCuerpo()).toBe("Cuerpo nuevo");
+    });
+
+    it("agrega y quita destinatarios de un borrador", () => {
+      const gestor = new GestorDeCorreos();
+      const borrador = new Correo(ana, "Hola", "", [beto]);
+      gestor.guardarBorrador(borrador);
+      const caro = new Contacto("Caro", "caro@gmail.com");
+      gestor.editarBorrador(borrador, {
+        agregarDestinatarios: [caro],
+        quitarDestinatarios: ["beto@ucp.edu.ar"],
+      });
+      expect(borrador.getDestinatarios()).toEqual([caro]);
+    });
+
+    it("los cambios se conservan en la bandeja de borradores", () => {
+      const gestor = new GestorDeCorreos();
+      const borrador = new Correo(ana);
+      gestor.guardarBorrador(borrador);
+      gestor.editarBorrador(borrador, { asunto: "Primera versión" });
+      gestor.editarBorrador(borrador, { asunto: "Versión final" });
+      expect(gestor.listar("borradores")).toHaveLength(1);
+      expect(gestor.listar("borradores")[0].getAsunto()).toBe("Versión final");
+    });
+
+    it("no permite editar un correo que no es borrador", () => {
+      const gestor = new GestorDeCorreos();
+      const recibido = new Correo(beto, "Hola", "", [ana]);
+      gestor.recibir(recibido);
+      expect(() => gestor.editarBorrador(recibido, { asunto: "Otro" })).toThrow("Solo se pueden editar borradores");
+      expect(() => gestor.editarBorrador(new Correo(ana), { asunto: "Otro" })).toThrow("Solo se pueden editar borradores");
+      expect(recibido.getAsunto()).toBe("Hola");
+    });
+  });
 });
