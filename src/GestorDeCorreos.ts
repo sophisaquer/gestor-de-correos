@@ -1,5 +1,13 @@
 import { Bandeja, type TipoBandeja } from "./Bandeja";
 import { Correo } from "./Correo";
+import type { Contacto } from "./Contacto";
+
+export interface CambiosBorrador {
+  asunto?: string;
+  cuerpo?: string;
+  agregarDestinatarios?: Contacto[];
+  quitarDestinatarios?: string[];
+}
 
 export class GestorDeCorreos {
   private readonly bandejas = new Map<TipoBandeja, Bandeja>([
@@ -31,6 +39,20 @@ export class GestorDeCorreos {
   guardarBorrador(correo: Correo): void {
     this.validarQueNoEsteEnElGestor(correo);
     this.bandeja("borradores").agregar(correo);
+  }
+
+  editarBorrador(correo: Correo, cambios: CambiosBorrador): void {
+    if (this.bandejaDe(correo) !== "borradores") {
+      throw new Error("Solo se pueden editar borradores");
+    }
+    if (cambios.asunto !== undefined) {
+      correo.setAsunto(cambios.asunto);
+    }
+    if (cambios.cuerpo !== undefined) {
+      correo.setCuerpo(cambios.cuerpo);
+    }
+    cambios.agregarDestinatarios?.forEach((c) => correo.agregarDestinatario(c));
+    cambios.quitarDestinatarios?.forEach((email) => correo.quitarDestinatario(email));
   }
 
   eliminar(correo: Correo): void {
