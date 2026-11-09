@@ -55,6 +55,24 @@ export class GestorDeCorreos {
     cambios.quitarDestinatarios?.forEach((email) => correo.quitarDestinatario(email));
   }
 
+  enviar(correo: Correo): void {
+    if (!correo.esValidoParaEnviar()) {
+      throw new Error("El correo no es válido para enviar");
+    }
+    const actual = this.bandejaDe(correo);
+    if (actual === "enviados") {
+      throw new Error("El correo ya fue enviado");
+    }
+    if (actual === "borradores") {
+      this.mover(correo, "borradores", "enviados");
+      return;
+    }
+    if (actual !== undefined) {
+      throw new Error("Solo se pueden enviar correos nuevos o borradores");
+    }
+    this.bandeja("enviados").agregar(correo);
+  }
+
   eliminar(correo: Correo): void {
     const origen = this.bandejaDe(correo);
     if (origen === undefined) {
