@@ -180,3 +180,72 @@ describe("GestorDeCorreos", () => {
     });
   });
 });
+
+describe("GestorDeCorreos - envío", () => {
+  it("un correo enviado queda en Enviados", () => {
+    const gestor = new GestorDeCorreos();
+    const correo = new Correo(ana, "Hola", "", [beto]);
+    gestor.enviar(correo);
+    expect(gestor.listar("enviados")).toEqual([correo]);
+    expect(gestor.bandejaDe(correo)).toBe("enviados");
+  });
+
+  it("se puede enviar a varios destinatarios", () => {
+    const gestor = new GestorDeCorreos();
+    const caro = new Contacto("Caro", "caro@gmail.com");
+    const correo = new Correo(ana, "Hola", "", [beto, caro]);
+    gestor.enviar(correo);
+    expect(gestor.listar("enviados")[0].getDestinatarios()).toEqual([beto, caro]);
+  });
+
+  it("un borrador enviado pasa a Enviados y deja de estar en Borradores", () => {
+    const gestor = new GestorDeCorreos();
+    const borrador = new Correo(ana);
+    gestor.guardarBorrador(borrador);
+    gestor.editarBorrador(borrador, { asunto: "Entrega", agregarDestinatarios: [beto] });
+    gestor.enviar(borrador);
+    expect(gestor.listar("borradores")).toEqual([]);
+    expect(gestor.listar("enviados")).toEqual([borrador]);
+  });
+
+  it("un borrador inválido no se envía y sigue en Borradores", () => {
+    const gestor = new GestorDeCorreos();
+    const borrador = new Correo(ana, "Sin destinatarios");
+    gestor.guardarBorrador(borrador);
+    expect(() => gestor.enviar(borrador)).toThrow("no es válido");
+    expect(gestor.listar("borradores")).toEqual([borrador]);
+    expect(gestor.listar("enviados")).toEqual([]);
+  });
+
+  it("un correo sin asunto no se envía", () => {
+    const gestor = new GestorDeCorreos();
+    expect(() => gestor.enviar(new Correo(ana, "", "Hola", [beto]))).toThrow("no es válido");
+    expect(gestor.listar("enviados")).toEqual([]);
+  });
+
+  it("enviar dos veces el mismo correo no genera duplicados", () => {
+    const gestor = new GestorDeCorreos();
+    const correo = new Correo(ana, "Hola", "", [beto]);
+    gestor.enviar(correo);
+    expect(() => gestor.enviar(correo)).toThrow("ya fue enviado");
+    expect(gestor.listar("enviados")).toHaveLength(1);
+  });
+
+  it("no se puede enviar un correo recibido", () => {
+    const gestor = new GestorDeCorreos();
+    const recibido = new Correo(beto, "Hola", "", [ana]);
+    gestor.recibir(recibido);
+    expect(() => gestor.enviar(recibido)).toThrow("Solo se pueden enviar");
+    expect(gestor.listar("entrada")).toEqual([recibido]);
+    expect(gestor.listar("enviados")).toEqual([]);
+  });
+
+  it("un correo enviado y eliminado se restaura a Enviados", () => {
+    const gestor = new GestorDeCorreos();
+    const correo = new Correo(ana, "Hola", "", [beto]);
+    gestor.enviar(correo);
+    gestor.eliminar(correo);
+    gestor.restaurar(correo);
+    expect(gestor.listar("enviados")).toEqual([correo]);
+  });
+});
