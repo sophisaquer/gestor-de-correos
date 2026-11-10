@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-   "scripts": {
+  "scripts": {
     "typecheck": "tsc",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   "homepage": "https://github.com/sophisaquer/gestor-de-correos#readme",
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^5.1.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
   }
