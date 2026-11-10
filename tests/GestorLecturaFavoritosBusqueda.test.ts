@@ -101,4 +101,58 @@ describe("GestorDeCorreos - favoritos", () => {
     expect(gestor.favoritos()).toEqual([correo]);
   });
 });
+
+describe("GestorDeCorreos - búsqueda", () => {
+  it("encuentra correos de la Entrada por cualquiera de sus campos", () => {
+    const gestor = new GestorDeCorreos();
+    const examen = new Correo(ana, "Examen final", "Traer DNI", [beto]);
+    const otro = new Correo(beto, "Cumpleaños", "El sábado", [ana]);
+    gestor.recibir(examen);
+    gestor.recibir(otro);
+    expect(gestor.buscar("examen")).toEqual([examen]);
+    expect(gestor.buscar("sábado")).toEqual([otro]);
+  });
+
+  it("no distingue mayúsculas y acepta coincidencias parciales", () => {
+    const gestor = new GestorDeCorreos();
+    const correo = new Correo(ana, "Examen final");
+    gestor.recibir(correo);
+    expect(gestor.buscar("EXAM")).toEqual([correo]);
+  });
+
+  it("un correo aparece una sola vez aunque coincida en varios campos", () => {
+    const gestor = new GestorDeCorreos();
+    const correo = new Correo(ana, "Ana", "Hola Ana", [beto]);
+    gestor.recibir(correo);
+    expect(gestor.buscar("ana")).toEqual([correo]);
+  });
+
+  it("devuelve una colección vacía si no hay coincidencias", () => {
+    const gestor = new GestorDeCorreos();
+    gestor.recibir(new Correo(ana, "Hola"));
+    expect(gestor.buscar("vacaciones")).toEqual([]);
+  });
+
+  it("funciona sobre una bandeja vacía", () => {
+    const gestor = new GestorDeCorreos();
+    expect(gestor.buscar("hola")).toEqual([]);
+  });
+
+  it("solo busca en la Entrada", () => {
+    const gestor = new GestorDeCorreos();
+    gestor.enviar(new Correo(ana, "Examen", "", [beto]));
+    expect(gestor.buscar("examen")).toEqual([]);
+  });
+
+  it("buscar no modifica los correos originales", () => {
+    const gestor = new GestorDeCorreos();
+    const correo = new Correo(ana, "Examen final", "Traer DNI", [beto]);
+    gestor.recibir(correo);
+    gestor.buscar("EXAMEN");
+    expect(correo.getAsunto()).toBe("Examen final");
+    expect(correo.getCuerpo()).toBe("Traer DNI");
+    expect(correo.estaLeido()).toBe(false);
+    expect(gestor.listar("entrada")).toEqual([correo]);
+  });
+});
 });

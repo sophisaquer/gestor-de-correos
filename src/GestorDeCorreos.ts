@@ -1,6 +1,6 @@
 import { Bandeja, type TipoBandeja } from "./Bandeja";
 import { Correo } from "./Correo";
-import { noLeido, esFavorito } from "./Predicados";
+import { noLeido, esFavorito, contieneTexto } from "./Predicados";
 import type { Contacto } from "./Contacto";
 
 export interface CambiosBorrador {
@@ -98,10 +98,14 @@ export class GestorDeCorreos {
     noLeidos(tipo: TipoBandeja): Correo[] {
     return this.listar(tipo).filter(noLeido);
   }
-  
+
     favoritos(): Correo[] {
     const visibles: TipoBandeja[] = ["entrada", "enviados", "borradores"];
     return visibles.flatMap((tipo) => this.listar(tipo)).filter(esFavorito);
+  }
+
+  buscar(texto: string): Correo[] {
+    return this.listar("entrada").filter(contieneTexto(texto));
   }
 
   private mover(correo: Correo, desde: TipoBandeja, hasta: TipoBandeja): void {
