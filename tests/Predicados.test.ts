@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { noLeido, esFavorito } from "../src/Predicados";
+import { noLeido, esFavorito, contieneTexto } from "../src/Predicados";
 import { Correo } from "../src/Correo";
 import { Contacto } from "../src/Contacto";
 
@@ -27,4 +27,34 @@ describe("Predicados básicos", () => {
     const sinLeer = new Correo(ana, "Dos");
     expect([leido, sinLeer].filter(noLeido)).toEqual([sinLeer]);
   });
+  
+describe("Predicado contieneTexto", () => {
+  const correo = new Correo(ana, "Examen final", "La entrega es el lunes", [beto]);
+
+  it("encuentra el texto en el asunto", () => {
+    expect(contieneTexto("examen")(correo)).toBe(true);
+  });
+
+  it("encuentra el texto en el cuerpo", () => {
+    expect(contieneTexto("entrega")(correo)).toBe(true);
+  });
+
+  it("encuentra el texto en el nombre o el email del remitente", () => {
+    expect(contieneTexto("pérez")(correo)).toBe(true);
+    expect(contieneTexto("ucp.edu")(correo)).toBe(true);
+  });
+
+  it("encuentra el texto en el nombre o el email de un destinatario", () => {
+    expect(contieneTexto("gómez")(correo)).toBe(true);
+    expect(contieneTexto("gmail")(correo)).toBe(true);
+  });
+
+  it("no distingue mayúsculas y acepta coincidencias parciales", () => {
+    expect(contieneTexto("EXA")(correo)).toBe(true);
+  });
+
+  it("es falso si el texto no aparece en ningún campo", () => {
+    expect(contieneTexto("vacaciones")(correo)).toBe(false);
+  });
+});
 });
