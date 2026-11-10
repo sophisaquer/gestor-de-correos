@@ -1,5 +1,6 @@
 import { Bandeja, type TipoBandeja } from "./Bandeja";
 import { Correo } from "./Correo";
+import { noLeido } from "./Predicados";
 import type { Contacto } from "./Contacto";
 
 export interface CambiosBorrador {
@@ -94,6 +95,10 @@ export class GestorDeCorreos {
     this.origenDeEliminados.delete(correo.getId());
   }
 
+    noLeidos(tipo: TipoBandeja): Correo[] {
+    return this.listar(tipo).filter(noLeido);
+  }
+  
   private mover(correo: Correo, desde: TipoBandeja, hasta: TipoBandeja): void {
     this.bandeja(desde).quitar(correo);
     this.bandeja(hasta).agregar(correo);
