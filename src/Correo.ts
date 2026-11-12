@@ -86,6 +86,10 @@ export class Correo {
     this.favorito = false;
   }
 
+  copiar(): Correo {
+    return new Correo(this.remitente, this.asunto, this.cuerpo, this.destinatarios);
+  }
+
   esValidoParaEnviar(): boolean {
     return this.asunto.trim() !== "" && this.destinatarios.length > 0;
   }
