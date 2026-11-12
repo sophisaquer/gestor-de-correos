@@ -11,6 +11,7 @@ export interface CambiosBorrador {
 }
 
 export class GestorDeCorreos {
+  private readonly propietario: Contacto;
   private readonly bandejas = new Map<TipoBandeja, Bandeja>([
     ["entrada", new Bandeja("entrada")],
     ["enviados", new Bandeja("enviados")],
@@ -18,6 +19,14 @@ export class GestorDeCorreos {
     ["eliminados", new Bandeja("eliminados")],
   ]);
   private readonly origenDeEliminados = new Map<number, TipoBandeja>();
+
+  constructor(propietario: Contacto) {
+    this.propietario = propietario;
+  }
+
+  getPropietario(): Contacto {
+    return this.propietario;
+  }
 
   listar(tipo: TipoBandeja): Correo[] {
     return this.bandeja(tipo).listar();
@@ -60,6 +69,9 @@ export class GestorDeCorreos {
     if (!correo.esValidoParaEnviar()) {
       throw new Error("El correo no es válido para enviar");
     }
+    if (correo.getRemitente().getEmail() !== this.propietario.getEmail()) {
+      throw new Error("Solo se pueden enviar correos propios");
+    }
     const actual = this.bandejaDe(correo);
     if (actual === "enviados") {
       throw new Error("El correo ya fue enviado");
@@ -95,11 +107,11 @@ export class GestorDeCorreos {
     this.origenDeEliminados.delete(correo.getId());
   }
 
-    noLeidos(tipo: TipoBandeja): Correo[] {
+  noLeidos(tipo: TipoBandeja): Correo[] {
     return this.listar(tipo).filter(noLeido);
   }
 
-    favoritos(): Correo[] {
+  favoritos(): Correo[] {
     const visibles: TipoBandeja[] = ["entrada", "enviados", "borradores"];
     return visibles.flatMap((tipo) => this.listar(tipo)).filter(esFavorito);
   }
