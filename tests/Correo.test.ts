@@ -127,3 +127,34 @@ describe("Correo - validación para enviar", () => {
     expect(correo.esValidoParaEnviar()).toBe(false);
   });
 });
+
+
+describe("Correo - copia", () => {
+  it("la copia tiene los mismos datos pero otro id", () => {
+    const original = new Correo(ana, "Examen", "El lunes", [beto, caro]);
+    const copia = original.copiar();
+    expect(copia.getId()).not.toBe(original.getId());
+    expect(copia.getRemitente()).toBe(ana);
+    expect(copia.getAsunto()).toBe("Examen");
+    expect(copia.getCuerpo()).toBe("El lunes");
+    expect(copia.getDestinatarios()).toEqual([beto, caro]);
+  });
+
+  it("la copia empieza como no leída y no favorita", () => {
+    const original = new Correo(ana, "Examen", "", [beto]);
+    original.marcarComoLeido();
+    original.marcarFavorito();
+    const copia = original.copiar();
+    expect(copia.estaLeido()).toBe(false);
+    expect(copia.esFavorito()).toBe(false);
+  });
+
+  it("cambiar la copia no cambia el original", () => {
+    const original = new Correo(ana, "Examen", "", [beto]);
+    const copia = original.copiar();
+    copia.marcarComoLeido();
+    copia.agregarDestinatario(caro);
+    expect(original.estaLeido()).toBe(false);
+    expect(original.getDestinatarios()).toEqual([beto]);
+  });
+});
