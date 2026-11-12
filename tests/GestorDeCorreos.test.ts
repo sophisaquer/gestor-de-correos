@@ -8,7 +8,7 @@ const beto = new Contacto("Beto", "beto@ucp.edu.ar");
 
 describe("GestorDeCorreos", () => {
   it("empieza con las cuatro bandejas vacías", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     expect(gestor.listar("entrada")).toEqual([]);
     expect(gestor.listar("enviados")).toEqual([]);
     expect(gestor.listar("borradores")).toEqual([]);
@@ -16,7 +16,7 @@ describe("GestorDeCorreos", () => {
   });
 
   it("un correo recibido queda en Entrada", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola", "", [ana]);
     gestor.recibir(correo);
     expect(gestor.listar("entrada")).toEqual([correo]);
@@ -24,7 +24,7 @@ describe("GestorDeCorreos", () => {
   });
 
   it("un borrador guardado queda en Borradores", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const borrador = new Correo(ana);
     gestor.guardarBorrador(borrador);
     expect(gestor.listar("borradores")).toEqual([borrador]);
@@ -32,12 +32,12 @@ describe("GestorDeCorreos", () => {
   });
 
   it("un correo que no está en el gestor no tiene bandeja", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     expect(gestor.bandejaDe(new Correo(ana, "Hola"))).toBeUndefined();
   });
 
   it("un correo no puede estar en dos bandejas a la vez", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     expect(() => gestor.recibir(correo)).toThrow("ya está");
@@ -47,7 +47,7 @@ describe("GestorDeCorreos", () => {
   });
 
   it("eliminar mueve el correo a Eliminados y lo saca de su bandeja", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     gestor.eliminar(correo);
@@ -57,7 +57,7 @@ describe("GestorDeCorreos", () => {
   });
 
   it("no permite eliminar dos veces el mismo correo", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     gestor.eliminar(correo);
@@ -66,12 +66,12 @@ describe("GestorDeCorreos", () => {
   });
 
   it("falla al eliminar un correo que no está en el gestor", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     expect(() => gestor.eliminar(new Correo(ana, "Hola"))).toThrow("no está");
   });
 
   it("restaura un correo de Entrada a Entrada", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     gestor.eliminar(correo);
@@ -81,7 +81,7 @@ describe("GestorDeCorreos", () => {
   });
 
   it("restaura un borrador a Borradores", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const borrador = new Correo(ana);
     gestor.guardarBorrador(borrador);
     gestor.eliminar(borrador);
@@ -91,7 +91,7 @@ describe("GestorDeCorreos", () => {
   });
 
   it("solo se pueden restaurar correos eliminados", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     expect(() => gestor.restaurar(correo)).toThrow("eliminados");
@@ -100,7 +100,7 @@ describe("GestorDeCorreos", () => {
   });
 
   it("eliminar y restaurar varias veces no genera duplicados", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     gestor.eliminar(correo);
@@ -112,7 +112,7 @@ describe("GestorDeCorreos", () => {
   });
 
   it("listar devuelve una copia que no modifica la bandeja", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     gestor.recibir(new Correo(beto, "Hola"));
     gestor.listar("entrada").pop();
     expect(gestor.listar("entrada")).toHaveLength(1);
@@ -121,7 +121,7 @@ describe("GestorDeCorreos", () => {
 
 describe("GestorDeCorreos - borradores", () => {
   it("permite recuperar los borradores guardados", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const b1 = new Correo(ana, "Uno");
     const b2 = new Correo(ana);
     gestor.guardarBorrador(b1);
@@ -130,7 +130,7 @@ describe("GestorDeCorreos - borradores", () => {
   });
 
   it("edita el asunto y el cuerpo de un borrador", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const borrador = new Correo(ana);
     gestor.guardarBorrador(borrador);
     gestor.editarBorrador(borrador, { asunto: "Reunión", cuerpo: "Mañana a las 10" });
@@ -140,7 +140,7 @@ describe("GestorDeCorreos - borradores", () => {
   });
 
   it("solo cambia los campos indicados", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const borrador = new Correo(ana, "Asunto original", "Cuerpo original");
     gestor.guardarBorrador(borrador);
     gestor.editarBorrador(borrador, { cuerpo: "Cuerpo nuevo" });
@@ -149,7 +149,7 @@ describe("GestorDeCorreos - borradores", () => {
   });
 
   it("agrega y quita destinatarios de un borrador", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const borrador = new Correo(ana, "Hola", "", [beto]);
     gestor.guardarBorrador(borrador);
     const caro = new Contacto("Caro", "caro@gmail.com");
@@ -161,7 +161,7 @@ describe("GestorDeCorreos - borradores", () => {
   });
 
   it("los cambios se conservan en la bandeja de borradores", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const borrador = new Correo(ana);
     gestor.guardarBorrador(borrador);
     gestor.editarBorrador(borrador, { asunto: "Primera versión" });
@@ -171,7 +171,7 @@ describe("GestorDeCorreos - borradores", () => {
   });
 
   it("no permite editar un correo que no es borrador", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const recibido = new Correo(beto, "Hola", "", [ana]);
     gestor.recibir(recibido);
     expect(() => gestor.editarBorrador(recibido, { asunto: "Otro" })).toThrow("Solo se pueden editar borradores");
@@ -182,7 +182,7 @@ describe("GestorDeCorreos - borradores", () => {
 
 describe("GestorDeCorreos - envío", () => {
   it("un correo enviado queda en Enviados", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(ana, "Hola", "", [beto]);
     gestor.enviar(correo);
     expect(gestor.listar("enviados")).toEqual([correo]);
@@ -190,7 +190,7 @@ describe("GestorDeCorreos - envío", () => {
   });
 
   it("se puede enviar a varios destinatarios", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const caro = new Contacto("Caro", "caro@gmail.com");
     const correo = new Correo(ana, "Hola", "", [beto, caro]);
     gestor.enviar(correo);
@@ -198,7 +198,7 @@ describe("GestorDeCorreos - envío", () => {
   });
 
   it("un borrador enviado pasa a Enviados y deja de estar en Borradores", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const borrador = new Correo(ana);
     gestor.guardarBorrador(borrador);
     gestor.editarBorrador(borrador, { asunto: "Entrega", agregarDestinatarios: [beto] });
@@ -208,7 +208,7 @@ describe("GestorDeCorreos - envío", () => {
   });
 
   it("un borrador inválido no se envía y sigue en Borradores", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const borrador = new Correo(ana, "Sin destinatarios");
     gestor.guardarBorrador(borrador);
     expect(() => gestor.enviar(borrador)).toThrow("no es válido");
@@ -217,13 +217,13 @@ describe("GestorDeCorreos - envío", () => {
   });
 
   it("un correo sin asunto no se envía", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     expect(() => gestor.enviar(new Correo(ana, "", "Hola", [beto]))).toThrow("no es válido");
     expect(gestor.listar("enviados")).toEqual([]);
   });
 
   it("enviar dos veces el mismo correo no genera duplicados", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(ana, "Hola", "", [beto]);
     gestor.enviar(correo);
     expect(() => gestor.enviar(correo)).toThrow("ya fue enviado");
@@ -231,7 +231,7 @@ describe("GestorDeCorreos - envío", () => {
   });
 
   it("no se puede enviar un correo recibido", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const recibido = new Correo(beto, "Hola", "", [ana]);
     gestor.recibir(recibido);
     expect(() => gestor.enviar(recibido)).toThrow("Solo se pueden enviar");
@@ -240,11 +240,25 @@ describe("GestorDeCorreos - envío", () => {
   });
 
   it("un correo enviado y eliminado se restaura a Enviados", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(ana, "Hola", "", [beto]);
     gestor.enviar(correo);
     gestor.eliminar(correo);
     gestor.restaurar(correo);
     expect(gestor.listar("enviados")).toEqual([correo]);
+  });
+});
+
+describe("GestorDeCorreos - propietario", () => {
+  it("cada gestor pertenece a un usuario", () => {
+    const gestor = new GestorDeCorreos(ana);
+    expect(gestor.getPropietario()).toBe(ana);
+  });
+
+  it("solo se pueden enviar correos cuyo remitente es el propietario", () => {
+    const gestor = new GestorDeCorreos(ana);
+    const ajeno = new Correo(beto, "Hola", "", [ana]);
+    expect(() => gestor.enviar(ajeno)).toThrow("Solo se pueden enviar correos propios");
+    expect(gestor.listar("enviados")).toEqual([]);
   });
 });

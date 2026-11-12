@@ -16,7 +16,7 @@ describe("GestorDeCorreos - leídos y no leídos", () => {
   });
 
   it("el estado se mantiene al consultar la bandeja", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     correo.marcarComoLeido();
@@ -24,7 +24,7 @@ describe("GestorDeCorreos - leídos y no leídos", () => {
   });
 
   it("obtiene los correos no leídos de una bandeja", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const leido = new Correo(beto, "Uno");
     const sinLeer = new Correo(beto, "Dos");
     gestor.recibir(leido);
@@ -34,7 +34,7 @@ describe("GestorDeCorreos - leídos y no leídos", () => {
   });
 
   it("el cambio de estado se refleja inmediatamente", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     expect(gestor.noLeidos("entrada")).toEqual([correo]);
@@ -45,7 +45,7 @@ describe("GestorDeCorreos - leídos y no leídos", () => {
   });
 
   it("una bandeja vacía no tiene no leídos", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     expect(gestor.noLeidos("entrada")).toEqual([]);
   });
   
@@ -59,7 +59,7 @@ describe("GestorDeCorreos - favoritos", () => {
   });
 
   it("la vista de favoritos junta correos de distintas bandejas", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const recibido = new Correo(beto, "Recibido");
     const enviado = new Correo(ana, "Enviado", "", [beto]);
     const comun = new Correo(beto, "Común");
@@ -72,7 +72,7 @@ describe("GestorDeCorreos - favoritos", () => {
   });
 
   it("marcar como favorito no mueve el correo de su bandeja", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     correo.marcarFavorito();
@@ -81,7 +81,7 @@ describe("GestorDeCorreos - favoritos", () => {
   });
 
   it("no hay duplicados en la vista de favoritos", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     correo.marcarFavorito();
@@ -90,7 +90,7 @@ describe("GestorDeCorreos - favoritos", () => {
   });
 
   it("un favorito eliminado no aparece hasta restaurarlo y conserva su marca", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(beto, "Hola");
     gestor.recibir(correo);
     correo.marcarFavorito();
@@ -104,7 +104,7 @@ describe("GestorDeCorreos - favoritos", () => {
 
 describe("GestorDeCorreos - búsqueda", () => {
   it("encuentra correos de la Entrada por cualquiera de sus campos", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const examen = new Correo(ana, "Examen final", "Traer DNI", [beto]);
     const otro = new Correo(beto, "Cumpleaños", "El sábado", [ana]);
     gestor.recibir(examen);
@@ -114,38 +114,38 @@ describe("GestorDeCorreos - búsqueda", () => {
   });
 
   it("no distingue mayúsculas y acepta coincidencias parciales", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(ana, "Examen final");
     gestor.recibir(correo);
     expect(gestor.buscar("EXAM")).toEqual([correo]);
   });
 
   it("un correo aparece una sola vez aunque coincida en varios campos", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(ana, "Ana", "Hola Ana", [beto]);
     gestor.recibir(correo);
     expect(gestor.buscar("ana")).toEqual([correo]);
   });
 
   it("devuelve una colección vacía si no hay coincidencias", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     gestor.recibir(new Correo(ana, "Hola"));
     expect(gestor.buscar("vacaciones")).toEqual([]);
   });
 
   it("funciona sobre una bandeja vacía", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     expect(gestor.buscar("hola")).toEqual([]);
   });
 
   it("solo busca en la Entrada", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     gestor.enviar(new Correo(ana, "Examen", "", [beto]));
     expect(gestor.buscar("examen")).toEqual([]);
   });
 
   it("buscar no modifica los correos originales", () => {
-    const gestor = new GestorDeCorreos();
+    const gestor = new GestorDeCorreos(ana);
     const correo = new Correo(ana, "Examen final", "Traer DNI", [beto]);
     gestor.recibir(correo);
     gestor.buscar("EXAMEN");
