@@ -1,5 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { noLeido, esFavorito, contieneTexto, and, or, not, type Predicado } from "../src/Predicados";import { noLeido, esFavorito, contieneTexto, and, or, not, delDominio, deRemitente, asuntoContiene, cuerpoContiene, type Predicado } from "../src/Predicados";
+import {
+  noLeido,
+  esFavorito,
+  contieneTexto,
+  and,
+  or,
+  not,
+  delDominio,
+  deRemitente,
+  asuntoContiene,
+  cuerpoContiene,
+  type Predicado,
+} from "../src/Predicados";
 import { Correo } from "../src/Correo";
 import { Contacto } from "../src/Contacto";
 
