@@ -20,3 +20,12 @@ export const contieneTexto = (texto: string): Predicado<Correo> => {
     return campos.some((campo) => campo.toLowerCase().includes(buscado));
   };
 };
+
+export const and = <T>(...predicados: Predicado<T>[]): Predicado<T> =>
+  (elemento) => predicados.every((p) => p(elemento));
+
+export const or = <T>(...predicados: Predicado<T>[]): Predicado<T> =>
+  (elemento) => predicados.some((p) => p(elemento));
+
+export const not = <T>(predicado: Predicado<T>): Predicado<T> =>
+  (elemento) => !predicado(elemento);
