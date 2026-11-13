@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { noLeido, esFavorito, contieneTexto, and, or, not, type Predicado } from "../src/Predicados";
+import { noLeido, esFavorito, contieneTexto, and, or, not, type Predicado } from "../src/Predicados";import { noLeido, esFavorito, contieneTexto, and, or, not, delDominio, deRemitente, asuntoContiene, cuerpoContiene, type Predicado } from "../src/Predicados";
 import { Correo } from "../src/Correo";
 import { Contacto } from "../src/Contacto";
 
@@ -99,5 +99,40 @@ describe("Combinadores de predicados", () => {
     const correos = [leidoNoFavorito, sinLeerFavorito, sinLeerComun];
     expect(correos.filter(and(noLeido, not(esFavorito)))).toEqual([sinLeerComun]);
     expect(correos.filter(or(not(noLeido), esFavorito))).toEqual([leidoNoFavorito, sinLeerFavorito]);
+  });
+});
+
+describe("Predicados por campo", () => {
+  const juan = new Contacto("Juan", "juan@alumnos.com");
+  const deLaUcp = new Correo(ana, "Examen de Paradigmas", "La entrega es el viernes", [beto]);
+  const deJuan = new Correo(juan, "Reunión", "Nos vemos mañana", [ana]);
+
+  it("delDominio reconoce remitentes de un dominio", () => {
+    expect(delDominio("@ucp.edu.ar")(deLaUcp)).toBe(true);
+    expect(delDominio("@ucp.edu.ar")(deJuan)).toBe(false);
+  });
+
+  it("delDominio funciona con o sin @ y sin importar mayúsculas", () => {
+    expect(delDominio("UCP.edu.ar")(deLaUcp)).toBe(true);
+  });
+
+  it("delDominio no confunde un dominio que solo termina parecido", () => {
+    const falso = new Correo(new Contacto("X", "x@noucp.edu.ar"), "Hola");
+    expect(delDominio("@ucp.edu.ar")(falso)).toBe(false);
+  });
+
+  it("deRemitente reconoce los correos de un contacto determinado", () => {
+    expect(deRemitente(juan)(deJuan)).toBe(true);
+    expect(deRemitente(juan)(deLaUcp)).toBe(false);
+  });
+
+  it("asuntoContiene busca solo en el asunto", () => {
+    expect(asuntoContiene("examen")(deLaUcp)).toBe(true);
+    expect(asuntoContiene("entrega")(deLaUcp)).toBe(false);
+  });
+
+  it("cuerpoContiene busca solo en el cuerpo", () => {
+    expect(cuerpoContiene("ENTREGA")(deLaUcp)).toBe(true);
+    expect(cuerpoContiene("examen")(deLaUcp)).toBe(false);
   });
 });
