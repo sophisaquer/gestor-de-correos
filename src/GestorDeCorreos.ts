@@ -48,6 +48,9 @@ export class GestorDeCorreos {
 
   guardarBorrador(correo: Correo): void {
     this.validarQueNoEsteEnElGestor(correo);
+    if (correo.getRemitente().getEmail() !== this.propietario.getEmail()) {
+      throw new Error("Solo se pueden guardar borradores propios");
+    }
     this.bandeja("borradores").agregar(correo);
   }
 
