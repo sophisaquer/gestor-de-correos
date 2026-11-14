@@ -2,6 +2,7 @@ import { Bandeja, type TipoBandeja } from "./Bandeja";
 import { Correo } from "./Correo";
 import { noLeido, esFavorito, contieneTexto } from "./Predicados";
 import type { Contacto } from "./Contacto";
+import type { Filtro } from "./Filtro";
 
 export interface CambiosBorrador {
   asunto?: string;
@@ -123,6 +124,10 @@ export class GestorDeCorreos {
     return this.listar("entrada").filter(contieneTexto(texto));
   }
 
+  aplicarFiltro(filtro: Filtro, tipo: TipoBandeja): Correo[] {
+    return filtro.aplicar(this.listar(tipo));
+  }
+  
   private mover(correo: Correo, desde: TipoBandeja, hasta: TipoBandeja): void {
     this.bandeja(desde).quitar(correo);
     this.bandeja(hasta).agregar(correo);
