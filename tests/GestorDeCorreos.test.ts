@@ -261,4 +261,12 @@ describe("GestorDeCorreos - propietario", () => {
     expect(() => gestor.enviar(ajeno)).toThrow("Solo se pueden enviar correos propios");
     expect(gestor.listar("enviados")).toEqual([]);
   });
+
+
+  it("solo se pueden guardar borradores cuyo remitente es el propietario", () => {
+    const gestor = new GestorDeCorreos(ana);
+    const ajeno = new Correo(beto, "Hola");
+    expect(() => gestor.guardarBorrador(ajeno)).toThrow("Solo se pueden guardar borradores propios");
+    expect(gestor.listar("borradores")).toEqual([]);
+  });
 });
