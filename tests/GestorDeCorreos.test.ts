@@ -262,6 +262,15 @@ describe("GestorDeCorreos - propietario", () => {
     expect(gestor.listar("enviados")).toEqual([]);
   });
 
+  it("no se puede volver a enviar un correo propio que está en Eliminados", () => {
+    const gestor = new GestorDeCorreos(ana);
+    const correo = new Correo(ana, "Hola", "", [beto]);
+    gestor.enviar(correo);
+    gestor.eliminar(correo);
+    expect(() => gestor.enviar(correo)).toThrow("Solo se pueden enviar correos nuevos o borradores");
+    expect(gestor.listar("eliminados")).toEqual([correo]);
+    expect(gestor.listar("enviados")).toEqual([]);
+  });
 
   it("solo se pueden guardar borradores cuyo remitente es el propietario", () => {
     const gestor = new GestorDeCorreos(ana);

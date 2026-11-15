@@ -4,7 +4,7 @@ import { GestorDeFiltros } from "../src/GestorDeFiltros";
 import { Filtro } from "../src/Filtro";
 import { Correo } from "../src/Correo";
 import { Contacto } from "../src/Contacto";
-import { delDominio, noLeido } from "../src/Predicados";
+import { delDominio, noLeido, and } from "../src/Predicados";
 import { pendientesDeRevision } from "../src/FiltrosComplejos";
 
 const ana = new Contacto("Ana", "ana@ucp.edu.ar");
@@ -72,5 +72,22 @@ describe("Aplicación de filtros en el gestor", () => {
     expect(buzonAna.aplicarFiltro(filtro, "entrada")).toHaveLength(1);
     expect(buzonCaro.aplicarFiltro(filtro, "entrada")).toHaveLength(2);
     expect(buzonAna.aplicarFiltro(filtro, "entrada")).toHaveLength(1);
+  });
+});
+
+
+describe("Filtros sobre favoritos", () => {
+  it("se pueden combinar filtros para buscar dentro de los favoritos", () => {
+    const gestor = new GestorDeCorreos(ana);
+    const favoritoUcpNoLeido = new Correo(profe, "Examen", "", [ana]);
+    const favoritoUcpLeido = new Correo(profe, "Notas", "", [ana]);
+    const favoritoGmail = new Correo(caro, "Hola", "", [ana]);
+    const noFavoritoUcp = new Correo(profe, "Aviso", "", [ana]);
+    [favoritoUcpNoLeido, favoritoUcpLeido, favoritoGmail, noFavoritoUcp].forEach((c) => gestor.recibir(c));
+    [favoritoUcpNoLeido, favoritoUcpLeido, favoritoGmail].forEach((c) => c.marcarFavorito());
+    favoritoUcpLeido.marcarComoLeido();
+
+    const filtro = new Filtro("UCP sin leer", and(delDominio("ucp.edu.ar"), noLeido));
+    expect(filtro.aplicar(gestor.favoritos())).toEqual([favoritoUcpNoLeido]);
   });
 });
